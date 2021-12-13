@@ -1,25 +1,29 @@
 package marketdataservice.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import marketdataservice.dto.MarketDto;
 import marketdataservice.dto.OrderDto;
+import marketdataservice.services.RedisMessageSubscriber;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.web.client.RestTemplate;
 
-@Slf4j
+import java.util.ArrayList;
+
+
 @Configuration
 public class RedisConfig {
-    @Value("167.99.202.174")
-    private String host;
-
     @Value("exchange1channel")
     private  String exchange1channel;
 
@@ -28,29 +32,25 @@ public class RedisConfig {
 
 
     @Bean
-    public RedisTemplate<String, OrderDto> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
-        RedisTemplate<String, OrderDto> template = new RedisTemplate<>();
-//        template.setDefaultSerializer(new StringRedisSerializer());
-        template.setDefaultSerializer(new Jackson2JsonRedisSerializer<OrderDto>(OrderDto.class));
-        template.setConnectionFactory(lettuceConnectionFactory);
-        return template;
-    }
-
-    @Bean
-    public RestTemplate restTemplates(RestTemplateBuilder builder) {
-        return builder.build();
-    }
-
-    @Bean
     public LettuceConnectionFactory lettuceConnectionFactory(){
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(host);
+//        redisStandaloneConfiguration.setHostName(host);
+        redisStandaloneConfiguration.setHostName("localhost");
         redisStandaloneConfiguration.setPort(6379);
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
 
+
     @Bean
-    @Primary
+    public RedisTemplate<String, ArrayList<MarketDto>> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
+        RedisTemplate<String, ArrayList<MarketDto>> template = new RedisTemplate<String, ArrayList<MarketDto>>();
+        template.setDefaultSerializer(new Jackson2JsonRedisSerializer<>(ArrayList.class));
+        template.setConnectionFactory(lettuceConnectionFactory());
+        return template;
+    }
+
+    @Bean
+//    @Primary
     public ChannelTopic exchange1ChannelTopic() {
         return ChannelTopic.of(exchange1channel);
     }
@@ -59,6 +59,23 @@ public class RedisConfig {
     public ChannelTopic exchange2ChannelTopic() {
         return ChannelTopic.of(exchange2channel);
     }
+
+
+//    @Bean
+//    MessageListenerAdapter messageListener() {
+//        return new MessageListenerAdapter(new RedisMessageSubscriber());
+//    }
+//
+//    private ObjectMapper objectMapper = new ObjectMapper();
+//
+//    @Bean
+//    RedisMessageListenerContainer redisContainer() {
+//        RedisMessageListenerContainer container
+//                = new RedisMessageListenerContainer();
+//        container.setConnectionFactory(lettuceConnectionFactory());
+//        container.addMessageListener(messageListener(), exchange1ChannelTopic());
+//        return container;
+//    }
 }
 
 
