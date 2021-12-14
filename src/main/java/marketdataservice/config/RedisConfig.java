@@ -1,22 +1,13 @@
 package marketdataservice.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import marketdataservice.dto.MarketDto;
-import marketdataservice.dto.OrderDto;
-import marketdataservice.services.RedisMessageSubscriber;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 import java.util.ArrayList;
@@ -34,7 +25,6 @@ public class RedisConfig {
     @Bean
     public LettuceConnectionFactory lettuceConnectionFactory(){
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-//        redisStandaloneConfiguration.setHostName(host);
         redisStandaloneConfiguration.setHostName("localhost");
         redisStandaloneConfiguration.setPort(6379);
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
@@ -61,21 +51,6 @@ public class RedisConfig {
     }
 
 
-//    @Bean
-//    MessageListenerAdapter messageListener() {
-//        return new MessageListenerAdapter(new RedisMessageSubscriber());
-//    }
-//
-//    private ObjectMapper objectMapper = new ObjectMapper();
-//
-//    @Bean
-//    RedisMessageListenerContainer redisContainer() {
-//        RedisMessageListenerContainer container
-//                = new RedisMessageListenerContainer();
-//        container.setConnectionFactory(lettuceConnectionFactory());
-//        container.addMessageListener(messageListener(), exchange1ChannelTopic());
-//        return container;
-//    }
 }
 
 

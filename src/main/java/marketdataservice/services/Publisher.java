@@ -36,6 +36,7 @@ public class Publisher {
 
     @PostMapping("/exchange2")
     public String publishExchange2(@RequestBody List<MarketDto> marketDto) {
+        log.info("Message recieved: {}" ,marketDto);
         redisTemplate.convertAndSend(exchange2ChannelTopic.getTopic(), marketDto.toString());
         return "Successfullly Published";
     }
